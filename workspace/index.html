@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <title>json to ui dsl</title>
+    <style>
+        /* 页面基本样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            gap: 5px;
+        }
+
+        /* 外部容器 */
+        .blocks-container {
+            display: flex;
+            gap: 5px;
+        }
+
+        /* 每个 block 的容器 */
+        .block {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 47vw;
+            height: 100vh;
+        }
+
+        /* 按钮样式 */
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* textarea样式 */
+        textarea {
+            width: 100%;
+            height: 70%;
+            padding: 3px;
+            font-size: 12px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+            resize: none;
+            overflow: auto;
+        }
+
+        #responseText::placeholder {
+            font-size: 20px;
+        }
+
+        textarea:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        /* 禁用按钮样式 */
+        .disabled-button {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* 禁用按钮时的悬停效果：保持颜色不变 */
+        .disabled-button:hover {
+            background-color: #ccc;
+        }
+
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* loading动画样式 */
+        .loading-container {
+            display: none;
+            position: absolute;
+            top: 45%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+        }
+
+        .loading {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        /* 进度条样式 */
+        progress {
+            width: 100%;
+            height: 20px;
+            border-radius: 10px;
+            border: none;
+            appearance: none;
+        }
+
+        /* Webkit browsers */
+        progress::-webkit-progress-bar {
+            background-color: #f4f4f4;
+            border-radius: 10px;
+        }
+
+        progress::-webkit-progress-value {
+            background-color: #4CAF50;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out; /* 平滑动画 */
+        }
+
+        /* Mozilla Firefox */
+        progress::-moz-progress-bar {
+            background-color: #4CAF50;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out; /* 平滑动画 */
+        }
+
+        /* 弹窗背景 */
+        .r-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 弹窗内容 */
+        .r-modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            overflow-y: auto;
+        }
+
+        /* 主标题 */
+        .r-modal-content h2 {
+            margin-top: 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        /* 副标题 */
+        .r-modal-content p {
+            font-size: 16px;
+            color: #555;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .r-modal-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .r-modal-content li {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 关闭按钮 */
+        .r-close-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+            width: 70%;
+            font-size: 18px;
+        }
+
+        .r-close-button:hover {
+            background-color: #45a049;
+        }
+
+        #backupCpuProgress::-webkit-progress-value {
+            background-color: red; /* Chrome, Safari, Edge */
+        }
+
+        #backupCpuProgress::-moz-progress-bar {
+            background-color: red; /* Firefox */
+        }
+
+        #backupCpuProgress {
+            background-color: #f0f0f0; /* 进度条背景色 */
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="blocks-container">
+    <div class="block">
+        <h4>JSON数据</h4>
+        <textarea id="responseText" placeholder="请输入Json格式数据，或者点击【试试手气】"></textarea>
+        <br><br>
+        <button id="inferenceButton0" onclick="openModal()" style="margin-right: 150px; margin-top: 30px;">README
+        </button>
+        <button id="inferenceButton1" onclick="fetchData()" style="margin-right: 150px; margin-top: 30px;">试试手气
+        </button>
+        <button id="inferenceButton" onclick="fetchData2()" style="margin-top: 30px;">开始推理</button>
+    </div>
+
+
+    <div class="block">
+        <h4>UI DSL 数据</h4>
+        <textarea id="responseText2" placeholder="" readonly></textarea>
+        <div class="loading-container" id="loadingContainer">
+            <div class="loading" id="loading"></div>
+        </div>
+        <br><br>
+        <div id="monitorContainer"
+             style="border: 2px dashed #ccc; top: -10px;padding: 10px; border-radius: 5px; position: relative;">
+            <span style="position: absolute; top: -10px; left: 10px; background-color: #f8f9fa; color: #4CAF50; padding: 0 8px; font-size: 12px; border: 1px solid #ccc; border-radius: 5px;font-weight: bold;">
+        主推理服务器
+            </span>
+            <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
+                <span id="cpuPercentage" style="margin-bottom: 5px; font-size: 10px;">CPU Usage: 0%</span>
+                <progress id="cpuProgress" value="0" max="100" style="width: 100%; height: 15px;"></progress>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <span id="gpuPercentage" style="margin-bottom: 5px; font-size: 10px;">GPU Usage: 0%</span>
+                <progress id="gpuProgress" value="0" max="100" style="width: 100%; height: 15px;"></progress>
+            </div>
+        </div>
+        <div id="backupMonitorContainer"
+             style="border: 2px dashed #ccc; top: 10px;padding: 10px; border-radius: 5px; position: relative;">
+            <span style="position: absolute; top: -10px; left: 10px; background-color: #f8f9fa; color: red; padding: 0 8px; font-size: 12px; border: 1px solid #ccc; border-radius: 5px;font-weight: bold;">
+        备用推理服务器（较主服务器推理速度降低约5倍）：主服务器连接不稳定时会降级到备用服务器推理 </span>
+
+            <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 0px;">
+                <span id="backupCpuPercentage" style="margin-bottom: 5px; font-size: 10px;">CPU Usage: 0%</span>
+                <progress id="backupCpuProgress" value="0" max="100" style="width: 100%; height: 15px;"></progress>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="r-modelModal" class="r-modal">
+    <div class="r-modal-content">
+        <p><strong>使用说明：</strong></p>
+        <ul>
+            <li><strong>试试手气:</strong> 随机抽取一条从未参与训练的数据样本（列表页或落地页 JSON 数据）进行模型推理测试。
+            </li>
+            <li><strong>开始推理:</strong> 使用模型推理。</li>
+        </ul>
+
+        <p><strong>支持标签：</strong></p>
+        <ul>
+            <li>布局类型：block，flex，list，li_item，card</li>
+            <li>文本类型：title，paragraph，text，bold_text，small_text，italic_text，address</li>
+            <li>资源类型：img，radian_img，video，media</li>
+            <li>链接类型：link</li>
+        </ul>
+
+        <p><strong>支持属性：</strong></p>
+        <ul>
+            <li>布局属性：flex-justify-content，flex-align-items</li>
+            <li>内容属性：content，src，href</li>
+            <li>逻辑属性：for，if，else-if，else</li>
+            <li>其他属性：border-radius</li>
+        </ul>
+        <div style=" text-align: center;width: 100%">
+            <button class="r-close-button" onclick="rCloseModal()">关闭</button>
+        </div>
+    </div>
+</div>
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h2>Error</h2>
+        <p id="errorMessage"></p>
+        <button class="close-button" onclick="closeModal()">关闭</button>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+    // 打开弹窗
+    function openModal() {
+        document.getElementById("r-modelModal").style.display = "flex";
+    }
+
+    // 关闭弹窗
+    function rCloseModal() {
+        document.getElementById("r-modelModal").style.display = "none";
+    }
+
+    function fetchData() {
+        document.getElementById('responseText').value = 'waiting...';
+        axios.get(`${window.location.origin}/create_random_json`, {
+            timeout: 6000000
+        })
+            .then(response => {
+                document.getElementById('responseText').value = JSON.stringify(response.data, null, 2);
+                fetchData2();
+            })
+            .catch(error => {
+                let errorMessage = error.code === 'ECONNABORTED' ? '请求超时，请稍后再试。' : '请求失败: ' + error.message;
+                showModal(errorMessage);
+            });
+    }
+
+    function fetchData2() {
+        const inferenceButton = document.getElementById('inferenceButton');
+        inferenceButton.classList.add("disabled-button");
+        inferenceButton.disabled = true;
+
+        const inferenceButton1 = document.getElementById('inferenceButton1');
+        inferenceButton1.classList.add("disabled-button");
+        inferenceButton1.disabled = true;
+
+        var inputValue = document.getElementById('responseText').value;
+        try {
+            JSON.parse(inputValue);
+        } catch (error) {
+            showModal('请输入正确的Json格式数据');
+            resetButton();
+            return;
+        }
+
+        document.getElementById('responseText2').value = 'waiting...';
+        showLoading(true);  // 显示loading动画
+
+        const formData = {data: inputValue};
+        const encodedData = new URLSearchParams(formData).toString();
+        axios.post(`${window.location.origin}/dsl`, encodedData, {
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            timeout: 600000
+        })
+            .then(response => {
+                document.getElementById('responseText2').value = JSON.stringify(response.data, null, 2);
+            })
+            .catch(error => {
+                showModal(error.message);
+            })
+            .finally(() => {
+                resetButton();
+                showLoading(false);  // 隐藏loading动画
+            });
+    }
+
+    function showLoading(show) {
+        const loadingContainer = document.getElementById('loadingContainer');
+        if (show) {
+            loadingContainer.style.display = 'block';
+        } else {
+            loadingContainer.style.display = 'none';
+        }
+    }
+
+    function resetButton() {
+        const inferenceButton = document.getElementById('inferenceButton');
+        inferenceButton.classList.remove("disabled-button");
+        inferenceButton.disabled = false;
+
+        const inferenceButton1 = document.getElementById('inferenceButton1');
+        inferenceButton1.classList.remove("disabled-button");
+        inferenceButton1.disabled = false;
+    }
+
+    function showModal(message) {
+        document.getElementById('errorMessage').innerText = message;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    function showMonitor(show) {
+        const monitorContainer = document.getElementById('monitorContainer');
+        if (show) {
+            monitorContainer.style.display = 'block';
+        } else {
+            monitorContainer.style.display = 'none';
+        }
+    }
+
+    // 打开 WebSocket 连接
+    function connectWebSocket() {
+        const baseUrl = "ws://" + window.location.hostname; // This excludes the port
+        const socketUrl = `${baseUrl}:8091`;
+        let socket = new WebSocket(socketUrl);
+
+        // 连接打开时
+        socket.onopen = function () {
+            // console.log('Connected to WebSocket server');
+        };
+
+        // 接收到消息时
+        socket.onmessage = function (event) {
+            try {
+                const rev = JSON.parse(event.data);
+                const cpu = rev['cpu'];  // 假设是百分比
+                const gpu = rev['gpu'];  // 假设是百分比
+
+                // 打印 CPU 和 GPU 数值
+                // console.log('cpu:', cpu, 'gpu:', gpu);
+
+                // 更新 CPU 进度条的值
+                const cpuProgress = document.getElementById('cpuProgress');
+                cpuProgress.value = cpu;
+                document.getElementById('cpuPercentage').innerText = `CPU Usage: ${cpu}%`;
+
+                // 更新 GPU 进度条的值
+                const gpuProgress = document.getElementById('gpuProgress');
+                gpuProgress.value = gpu;
+                document.getElementById('gpuPercentage').innerText = `GPU Usage: ${gpu}%`;
+            } catch (e) {
+                showMonitor(false)
+                console.error('解析 WebSocket 消息错误:', e);
+            }
+
+        };
+
+        // 连接关闭时
+        socket.onclose = function () {
+            // console.log('Disconnected from WebSocket server');
+        };
+
+        // 连接发生错误时
+        socket.onerror = function (error) {
+            // console.error('WebSocket Error: ', error);
+        };
+    }
+
+    function connectBackUpWebSocket() {
+        const baseUrl = "ws://" + window.location.hostname; // This excludes the port
+        const socketUrl = `${baseUrl}:8092`;
+        let socket = new WebSocket(socketUrl);
+        console.log('connectBackUpWebSocket:', socketUrl)
+        // 连接打开时
+        socket.onopen = function () {
+            // console.log('Connected to WebSocket server');
+        };
+
+        // 接收到消息时
+        socket.onmessage = function (event) {
+            try {
+                const rev = JSON.parse(event.data);
+                const cpu = rev['cpu'];
+                console.log('backup cpu', cpu)
+                // 更新 CPU 进度条的值
+                const cpuProgress = document.getElementById('backupCpuProgress');
+                cpuProgress.value = cpu;
+                document.getElementById('backupCpuPercentage').innerText = `CPU Usage: ${cpu}%`;
+            } catch (e) {
+                showMonitor(false)
+                console.error('解析 WebSocket 消息错误:', e);
+            }
+
+        };
+
+        // 连接关闭时
+        socket.onclose = function () {
+            console.log('backup Disconnected from WebSocket server');
+        };
+
+        // 连接发生错误时
+        socket.onerror = function (error) {
+            console.error('backup WebSocket Error: ', error);
+        };
+    }
+
+    connectBackUpWebSocket()
+    connectWebSocket()
+
+</script>
+
+</body>
+</html>

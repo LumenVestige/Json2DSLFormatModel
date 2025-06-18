@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模型说明弹窗</title>
+    <style>
+        /* 弹窗背景 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 弹窗内容 */
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            overflow-y: auto;
+        }
+
+        /* 主标题 */
+        .modal-content h2 {
+            margin-top: 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        /* 副标题 */
+        .modal-content p {
+            font-size: 16px;
+            color: #555;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        .modal-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .modal-content li {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 关闭按钮 */
+        .close-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+            width: 100%;
+            font-size: 18px;
+        }
+
+        .close-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 模型说明弹窗 -->
+<div id="modelModal" class="modal">
+    <div class="modal-content">
+        <h2>模型说明</h2>
+        <p><strong>模型简介：</strong></p>
+        <ul>
+            <li>本模型为基于 T5 自训练专项模型，在原始 T5 模型架构上进行了专用领域数据的深度自训练。</li>
+            <li>模型能够高效解析复杂层次的 JSON 数据结构，优化了在列表页、落地页等 JSON 格式中的特定字段识别与结构化数据推理的能力。</li>
+            <li>提升了对目标领域的精准性和泛化表现。</li>
+        </ul>
+
+        <p><strong>使用说明：</strong></p>
+        <ul>
+            <li><strong>试试手气:</strong> 随机抽取一条从未参与训练的数据样本（列表页或落地页 JSON 数据）进行模型推理测试。</li>
+            <li><strong>开始推理:</strong> 使用 T5 自训练专项模型执行推理输出UI DSL JSON数据。</li>
+        </ul>
+
+        <p><strong>支持标签：</strong></p>
+        <ul>
+            <li>布局类型：block，flex，list，li_item，card</li>
+            <li>文本类型：title，paragraph，text，bold_text，small_text，italic_text，address</li>
+            <li>资源类型：img，video，media，avatar</li>
+            <li>链接类型：link</li>
+        </ul>
+
+        <p><strong>支持属性：</strong></p>
+        <ul>
+            <li>布局属性：flex-justify-content，flex-align-items</li>
+            <li>内容属性：content，src，href</li>
+            <li>逻辑属性：for，if，else-if，else</li>
+            <li>其他属性：border-radius</li>
+        </ul>
+
+        <button class="close-button" onclick="closeModal()">关闭</button>
+    </div>
+</div>
+
+<!-- 打开弹窗按钮 -->
+<button onclick="openModal()">查看模型说明</button>
+
+<script>
+    // 打开弹窗
+    function openModal() {
+        document.getElementById("modelModal").style.display = "flex";
+    }
+
+    // 关闭弹窗
+    function closeModal() {
+        document.getElementById("modelModal").style.display = "none";
+    }
+</script>
+
+</body>
+</html>

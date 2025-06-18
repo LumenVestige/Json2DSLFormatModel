@@ -1,0 +1,10 @@
+/.venv/
+/venv/
+/.idea/json-to-ui-dsl.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vcs.xml
+/shelf/
+/workspace.xml
+/.idea/
