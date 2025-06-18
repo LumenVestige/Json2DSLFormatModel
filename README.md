@@ -1,5 +1,5 @@
-+ html访问环境：http://0.0.0.0:8888/dsl/test
-+ API接口:http://172.18.15.169:8099/dsl2
++ html访问环境：http://127.0.0.1:8888/dsl/test
++ API接口:http://127.0.0.1:8099/dsl2
     + 请求方式：post提交，参数为form-data格式，参数名为data,值为jsonstring
     + curl url 示范例子(注意jsonstring转义问题)：
         ```
