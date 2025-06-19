@@ -2,7 +2,7 @@ import json
 
 import requests
 
-url = "http://172.18.15.169:8099/dsl2"
+url = "http://127.0.0.1:8099/dsl2"
 
 data = {
 	"a": {
