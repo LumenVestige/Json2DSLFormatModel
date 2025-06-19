@@ -1,5 +1,6 @@
 <p>
-  <strong>👀 :</strong>
+   &nbsp;&nbsp;&nbsp;
+  <strong>👀</strong>
   <img src="https://profile-counter.glitch.me/LumenVestige.Json2DSLFormatModel/count.svg" alt="Visitor Count"  width="120"/>
 </p>
 
